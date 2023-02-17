@@ -13,8 +13,15 @@ module Audited
     attr_writer :audit_class
 
     def audit_class
-      @audit_class ||= Audit
+      # The audit_class is set as String in the initializer. It can not be constantized during initialization and must
+      # be constantized at runtime. See https://github.com/collectiveidea/audited/issues/608
+      @audit_class = @audit_class.safe_constantize if @audit_class.is_a?(String)
+      @audit_class ||= Audited::Audit
     end
+
+    # remove audit_model in next major version it was only shortly present in 5.1.0
+    alias_method :audit_model, :audit_class
+    deprecate audit_model: "use Audited.audit_class instead of Audited.audit_model. This method will be removed."
 
     def store
       current_store_value = Thread.current.thread_variable_get(:audited_store)
@@ -39,9 +46,9 @@ module Audited
 end
 
 require "audited/auditor"
-require "audited/audit"
 
 ActiveSupport.on_load :active_record do
+  require "audited/audit"
   include Audited::Auditor
 end
 

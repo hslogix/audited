@@ -1,6 +1,9 @@
 require "spec_helper"
 
-SingleCov.covered! uncovered: 9 # not testing proxy_respond_to? hack / 2 methods / deprecation of `version`
+# not testing proxy_respond_to? hack / 2 methods / deprecation of `version`
+# also, an additional 3 around `after_touch` for Versions before 6.
+uncovered = ActiveRecord::VERSION::MAJOR < 6 ? 12 : 9
+SingleCov.covered! uncovered: uncovered
 
 class ConditionalPrivateCompany < ::ActiveRecord::Base
   self.table_name = "companies"
@@ -215,23 +218,39 @@ describe Audited::Auditor do
       redacted = Audited::Auditor::AuditedInstanceMethods::REDACTED
       user =
         Models::ActiveRecord::UserMultipleRedactedAttributes.create(
-          password: "password",
-          ssn: 123456789
+          password: "password"
         )
       user.save!
       expect(user.audits.last.audited_changes["password"]).to eq(redacted)
+      # Saving '[REDACTED]' value for 'ssn' even if value wasn't set explicitly when record was created
       expect(user.audits.last.audited_changes["ssn"]).to eq(redacted)
+
       user.password = "new_password"
       user.ssn = 987654321
       user.save!
       expect(user.audits.last.audited_changes["password"]).to eq([redacted, redacted])
       expect(user.audits.last.audited_changes["ssn"]).to eq([redacted, redacted])
+
+      # If we haven't changed any attrs from 'redacted' list, audit should not contain these keys
+      user.name = "new name"
+      user.save!
+      expect(user.audits.last.audited_changes).to have_key('name')
+      expect(user.audits.last.audited_changes).not_to have_key('password')
+      expect(user.audits.last.audited_changes).not_to have_key('ssn')
     end
 
     it "should redact columns in 'redacted' column with custom option" do
       user = Models::ActiveRecord::UserRedactedPasswordCustomRedaction.create(password: "password")
       user.save!
       expect(user.audits.last.audited_changes["password"]).to eq(["My", "Custom", "Value", 7])
+    end
+
+    if ::ActiveRecord::VERSION::MAJOR >= 7
+      it "should filter encrypted attributes" do
+        user = Models::ActiveRecord::UserWithEncryptedPassword.create(password: "password")
+        user.save
+        expect(user.audits.last.audited_changes["password"]).to eq("[FILTERED]")
+      end
     end
 
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
@@ -272,11 +291,11 @@ describe Audited::Auditor do
       yesterday = 1.day.ago
 
       u = Models::ActiveRecord::NoAttributeProtectionUser.new(name: "name",
-                                                              username: "username",
-                                                              password: "password",
-                                                              activated: true,
-                                                              suspended_at: yesterday,
-                                                              logins: 2)
+        username: "username",
+        password: "password",
+        activated: true,
+        suspended_at: yesterday,
+        logins: 2)
 
       expect(u.name).to eq("name")
       expect(u.username).to eq("username")
@@ -402,6 +421,45 @@ describe Audited::Auditor do
           @user.audit_comment = "Comment"
           @user.save!
         }.to change(Audited::Audit, :count)
+      end
+    end
+  end
+
+  if ::ActiveRecord::VERSION::MAJOR >= 6
+    describe "on touch" do
+      before do
+        @user = create_user(name: "Brandon", status: :active)
+      end
+
+      it "should save an audit" do
+        expect { @user.touch(:suspended_at) }.to change(Audited::Audit, :count).by(1)
+      end
+
+      it "should set the action to 'update'" do
+        @user.touch(:suspended_at)
+        expect(@user.audits.last.action).to eq("update")
+        expect(Audited::Audit.updates.order(:id).last).to eq(@user.audits.last)
+        expect(@user.audits.updates.last).to eq(@user.audits.last)
+      end
+
+      it "should store the changed attributes" do
+        @user.touch(:suspended_at)
+        expect(@user.audits.last.audited_changes["suspended_at"][0]).to be_nil
+        expect(Time.parse(@user.audits.last.audited_changes["suspended_at"][1].to_s)).to be_within(2.seconds).of(Time.current)
+      end
+
+      it "should store audit comment" do
+        @user.audit_comment = "Here exists a touch comment"
+        @user.touch(:suspended_at)
+        expect(@user.audits.last.action).to eq("update")
+        expect(@user.audits.last.comment).to eq("Here exists a touch comment")
+      end
+
+      it "should not save an audit if only specified on create/destroy" do
+        on_create_destroy = Models::ActiveRecord::OnCreateDestroyUser.create(name: "Bart")
+        expect {
+          on_create_destroy.touch(:suspended_at)
+        }.to_not change(Audited::Audit, :count)
       end
     end
   end
@@ -814,6 +872,15 @@ describe Audited::Auditor do
       }.to_not change(Audited::Audit, :count)
     end
 
+    context "when global audits are disabled" do
+      it "should re-enable class audits after #without_auditing block" do
+        Audited.auditing_enabled = false
+        Models::ActiveRecord::User.without_auditing {}
+        Audited.auditing_enabled = true
+        expect(Models::ActiveRecord::User.auditing_enabled).to eql(true)
+      end
+    end
+
     it "should reset auditing status even it raises an exception" do
       begin
         Models::ActiveRecord::User.without_auditing { raise }
@@ -882,6 +949,15 @@ describe Audited::Auditor do
         Models::ActiveRecord::User.with_auditing { Models::ActiveRecord::User.create!(name: "Brandon") }
         Models::ActiveRecord::User.auditing_enabled = true
       }.to change(Audited::Audit, :count).by(1)
+    end
+
+    context "when global audits are disabled" do
+      it "should re-enable class audits after #with_auditing block" do
+        Audited.auditing_enabled = false
+        Models::ActiveRecord::User.with_auditing {}
+        Audited.auditing_enabled = true
+        expect(Models::ActiveRecord::User.auditing_enabled).to eql(true)
+      end
     end
 
     it "should reset auditing status even it raises an exception" do

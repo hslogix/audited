@@ -1,5 +1,76 @@
 # Audited ChangeLog
 
+## Unreleased
+
+- Testing Improvements - @vlad-psh
+  [#628](https://github.com/collectiveidea/audited/pull/628)
+- Testing Improvements - @mcyoung
+  [#658](https://github.com/collectiveidea/audited/pull/658)
+
+## 5.3.0 (2023-02-14)
+
+- Audit touch calls - @mcyoung
+  [#657](https://github.com/collectiveidea/audited/pull/657)
+- Allow using with Padrino and other non-Rails projects - @nicduke38degrees
+  [#655](https://github.com/collectiveidea/audited/pull/655)
+- Testing updates - @jdufresne
+  [#652](https://github.com/collectiveidea/audited/pull/652)
+  [#653](https://github.com/collectiveidea/audited/pull/653)
+
+## 5.2.0 (2023-01-23)
+
+Improved
+
+- config.audit_class can take a string or constant - @rocket-turtle
+  Fixes overzealous change in 5.1.0 where it only took a string.
+  [#648](https://github.com/collectiveidea/audited/pull/648)
+- README link fix - @jeremiahlukus
+  [#646](https://github.com/collectiveidea/audited/pull/646)
+- Typo fix in GitHub Actions - @jdufresne
+  [#644](https://github.com/collectiveidea/audited/pull/644)
+
+## 5.1.0 (2022-12-23)
+
+Changed
+
+- config.audit_class takes a string - @simmerz
+  [#609](https://github.com/collectiveidea/audited/pull/609)
+- Filter encrypted attributes automatically - @vlad-psh
+  [#630](https://github.com/collectiveidea/audited/pull/630)
+
+Improved
+
+- README improvements - @jess, @mstroming
+  [#605](https://github.com/collectiveidea/audited/pull/605)
+  [#640](https://github.com/collectiveidea/audited/issues/640)
+- Ignore deadlocks in concurrent audit combinations - @Crammaman
+  [#621](https://github.com/collectiveidea/audited/pull/621)
+- Fix timestamped_migrations deprecation warning - @shouichi
+  [#624](https://github.com/collectiveidea/audited/pull/624)
+- Ensure audits are re-enabled after blocks - @dcorlett
+  [#632](https://github.com/collectiveidea/audited/pull/632)
+- Replace raw string where clause with query methods - @macowie
+  [#642](https://github.com/collectiveidea/audited/pull/642)
+- Test against more Ruby/Rails Versions - @enomotodev, @danielmorrison
+  [#610](https://github.com/collectiveidea/audited/pull/610)
+  [#643](https://github.com/collectiveidea/audited/pull/643)
+
+## 5.0.2 (2021-09-16)
+
+Added
+
+- Relax ActiveRecord version constraint to support Rails 7
+  [#597](https://github.com/collectiveidea/audited/pull/597)
+
+Improved
+
+- Improve loading - @mvastola
+  [#592](https://github.com/collectiveidea/audited/pull/592)
+- Update README - @danirod, @clement1234
+  [#596](https://github.com/collectiveidea/audited/pull/596)
+  [#594](https://github.com/collectiveidea/audited/pull/594)
+
+
 ## 5.0.1 (2021-06-11)
 
 Improved
