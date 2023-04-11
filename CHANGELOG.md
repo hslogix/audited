@@ -1,7 +1,14 @@
 # Audited ChangeLog
 
-## Unreleased
+## 5.3.2 (2023-02-22)
 
+- Touch audit bug fixes - @mcyoung
+  [#662](https://github.com/collectiveidea/audited/pull/662)
+
+## 5.3.1 (2023-02-21)
+
+- Ensure touch support doesn't cause double audits - @mcyoung
+  [#660](https://github.com/collectiveidea/audited/pull/660)
 - Testing Improvements - @vlad-psh
   [#628](https://github.com/collectiveidea/audited/pull/628)
 - Testing Improvements - @mcyoung
