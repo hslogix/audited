@@ -1,9 +1,60 @@
 # Audited ChangeLog
 
+### 5.8.0 (2024-11-08)
+- Allow calling audited multiple times - @mohammednasser-32
+  [734](https://github.com/collectiveidea/audited/pull/734)  
+- Relax gemspec to allow Rails 8.1 - @BranLiang
+  [738](https://github.com/collectiveidea/audited/pull/738)
+
+### 5.7.0 (2024-08-13)
+
+- Support for Rails 7.2 and Ruby 3.3, and testing cleanups - @mattbrictson
+  [#723](https://github.com/collectiveidea/audited/pull/723)
+- Allow max_audits to be a proc or symbol - @gmhawash
+  [#718](https://github.com/collectiveidea/audited/pull/718)
+- Support Rails 8 - @fernandomenolli
+  [#717](https://github.com/collectiveidea/audited/pull/717)
+
+
+### 5.6.0 (2024-04-05)
+
+- Removed support for Rails 5.0 and 5.1.
+- Replace RequestStore with ActiveSupport::CurrentAttributes - @punkisdead
+  [#702](https://github.com/collectiveidea/audited/pull/702)
+
+### 5.5.0 (2024-04-02)
+
+- Bad release. Same code as 5.4.1. Use 5.6.0 for updated features.
+
+### 5.4.3 (2024-01-11)
+
+- Ignore readonly columns in audit - @sriddbs
+  [#692](https://github.com/collectiveidea/audited/pull/692)
+- Robustify Rails version checks - @blaet
+  [#689](https://github.com/collectiveidea/audited/pull/689)
+-  Ignore callbacks if not specifed on the model
+  [#679](https://github.com/collectiveidea/audited/pull/679)
+
+## 5.4.2 (2023-11-30)
+
+- Revert replacing RequetStore with ActiveSupport::CurrentAttributes until it is fully tested.
+
+## 5.4.1 (2023-11-30)
+
+- Replace RequestStore with ActiveSupport::CurrentAttributes - @the-spectator
+  [#673](https://github.com/collectiveidea/audited/pull/673/)
+- Don't require railtie when used outside of Rails - @nicduke38degrees
+  [#665](https://github.com/collectiveidea/audited/pull/665)
+
+## 5.4.0 (2023-09-30)
+
+- Add Rails 7.1 support - @yuki24
+  [#686](https://github.com/collectiveidea/audited/pull/686)
+
 ## 5.3.3 (2023-03-24)
 
 - Use RequestStore instead of Thread.current for thread-safe requests - @tiagocassio
-  [#669](https://github.com/collectiveidea/audited/pull/669)
+  [#669](https://github.com/c ollectiveidea/audited/pull/669)
 - Clean up Touch audits - @mcyoung, @akostadinov
   [#668](https://github.com/collectiveidea/audited/pull/668)
 
